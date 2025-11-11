@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "sprint_15_bootcamp",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "nodemon app.js",
     "dev": "nodemon app.js",

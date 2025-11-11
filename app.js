@@ -1,16 +1,20 @@
-import express from "express";
+const express = require("express");
+const app = express();
 
 const { PORT = 3000 } = process.env;
 
-const app = express();
+const userRoute = require("./routes/users");
+
+const cardsRoute = require("./routes/cards");
+
 app.listen(PORT, () => {
   console.log(`O app está executando na porta ${PORT}`);
 });
 
-app.get("/users/:id", (req, res) => {
-  if (!users[req.params.id]) {
-    res.status(404).send("ID do usuário não encontrado");
-    return;
-  }
-  res.send(users[req.params.id]);
+app.use("/users", userRoute);
+
+app.use("/cards", cardsRoute);
+
+app.use((req, res) => {
+  res.status(404).send({ message: "A solicitação não foi encontrada" });
 });
