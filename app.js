@@ -14,6 +14,14 @@ const cardsRoute = require("./routes/cards");
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: "692606ff175b3a895350d06d",
+  };
+
+  next();
+});
+
 app.post("/debug", (req, res) => {
   console.log("BODY RECEBIDO:", req.body);
   res.send({ body: req.body });

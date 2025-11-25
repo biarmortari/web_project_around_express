@@ -9,6 +9,7 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
+  console.log(req.user._id);
   const { name, link } = req.body;
 
   if (!name || !link) {
@@ -16,9 +17,9 @@ module.exports.createCard = (req, res) => {
       .status(400)
       .send({ message: `O nome do cartão e a URL são obrigatórios` });
   }
-  Card.create({ name, link })
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(404).send({ message: `Erro ao criar cartão` }));
+  Card.create({ name, link, owner: req.user._id })
+    .then((card) => res.send(card))
+    .catch((err) => res.status(500).send({ message: `Erro ao criar cartão` }));
 };
 
 module.exports.deleteCard = (req, res) => {
