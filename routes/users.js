@@ -8,4 +8,6 @@ router.post("/:userId", getUserById);
 
 router.post("/", createUser);
 
+router.patch("/me", updateProfile);
+
 module.exports = router;
