@@ -43,3 +43,29 @@ module.exports.createUser = (req, res) => {
       return res.status(500).send({ message: `Erro ao criar usuário` });
     });
 };
+
+module.exports.updateProfile = (req, res) => {
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._Id,
+    { name, about },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(400).send({ message: "Dados inválidos" });
+      }
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "ID inválido" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Usuário não encontrado" });
+      }
+      return res
+        .status(500)
+        .send({ message: "Erro interno ao buscar usuário" });
+    });
+};
