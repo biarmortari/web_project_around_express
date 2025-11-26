@@ -12,27 +12,34 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
+    .orFail()
     .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: "Usuário não encontrado" });
-      }
       res.send({ data: user });
     })
-    .catch(() => res.status(500).send({ message: "Erro" }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "ID inválido" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Usuário não encontrado" });
+      }
+      return res
+        .status(500)
+        .send({ message: "Erro interno ao buscar usuário" });
+    });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  if (!name || !about || !avatar) {
-    return res
-      .status(400)
-      .send({ message: "Os campos name, about e avatar são obrigatórios." });
-  }
-
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch((err) =>
-      res.status(500).send({ message: `Erro ao criar usuário: ${err.message}` })
-    );
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res
+          .status(400)
+          .send({ message: "Dados inválidos para criação do usuário" });
+      }
+      return res.status(500).send({ message: `Erro ao criar usuário` });
+    });
 };
