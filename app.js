@@ -8,9 +8,6 @@ const { PORT = 3000 } = process.env;
 
 mongoose.connect("mongodb://localhost:27017/aroundb");
 
-const userRoute = require("./routes/users");
-const cardsRoute = require("./routes/cards");
-
 app.use((req, res, next) => {
   req.user = {
     _id: "692606ff175b3a895350d06d",
@@ -18,6 +15,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+const userRoute = require("./routes/users");
+const cardsRoute = require("./routes/cards");
 
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
