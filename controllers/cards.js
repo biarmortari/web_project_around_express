@@ -40,3 +40,49 @@ module.exports.deleteCard = (req, res) => {
         .send({ message: "Error interno ao deletar cartão" });
     });
 };
+
+module.exports.likeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail()
+    .then((card) => {
+      res.send(card);
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "ID inválido" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Card não encontrado" });
+      }
+      return res
+        .status(500)
+        .send({ message: "Error interno ao curtir cartão" });
+    });
+};
+
+module.exports.dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail()
+    .then((card) => {
+      res.send(card);
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "ID inválido" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Card não encontrado" });
+      }
+      return res
+        .status(500)
+        .send({ message: "Erro interno ao descurtir cartão" });
+    });
+};
