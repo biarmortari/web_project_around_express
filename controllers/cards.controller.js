@@ -1,4 +1,4 @@
-const Card = require("../models/card");
+const Card = require("../models/card.model");
 
 module.exports.getCards = (req, res) => {
   Card.find({})
