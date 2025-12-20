@@ -22,11 +22,6 @@ const cardsRoute = require("./routes/cards");
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
 
-app.post("/debug", (req, res) => {
-  console.log("BODY RECEBIDO:", req.body);
-  res.send({ body: req.body });
-});
-
 app.use((req, res) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 });
