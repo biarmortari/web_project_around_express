@@ -29,19 +29,33 @@ module.exports.getUserById = (req, res) => {
     });
 };
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+module.exports.createUser = async (req, res) => {
+  const { email, password, name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res
-          .status(400)
-          .send({ message: "Dados inválidos para criação do usuário" });
-      }
-      return res.status(500).send({ message: `Erro ao criar usuário` });
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      name,
+      about,
+      avatar,
     });
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    return res.status(201).send(userResponse);
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      return res.status(400).send({ message: "Dados inválidos" });
+    }
+    if (err.code === 11000) {
+      return res.status(409).send({ message: "Este e-mail já está em uso" });
+    }
+    return res.status(500).send({ message: "Erro interno no servidor" });
+  }
 };
 
 module.exports.updateProfile = (req, res) => {
