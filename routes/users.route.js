@@ -8,11 +8,11 @@ const {
   updateAvatar,
 } = require("../controllers/users.controller");
 
-router.get("/", getUsers);
+const auth = require("../middleware/auth.middleware");
+
+router.get("/", auth, getUsers);
 
 router.get("/:userId", getUserById);
-
-//router.post("/", createUser);
 
 router.patch("/me", updateProfile);
 
