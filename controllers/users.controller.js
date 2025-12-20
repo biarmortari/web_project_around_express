@@ -1,4 +1,5 @@
 const User = require("../models/user.model");
+const bcrypt = require("bcryptjs");
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -46,7 +47,7 @@ module.exports.createUser = async (req, res) => {
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    return res.status(201).send(userResponse);
+    return res.status(201).send({ data: userResponse });
   } catch (err) {
     if (err.name === "ValidationError") {
       return res.status(400).send({ message: "Dados inválidos" });

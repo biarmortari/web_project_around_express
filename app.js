@@ -16,9 +16,11 @@ app.use((req, res, next) => {
   next();
 });
 
-const userRoute = require("./routes/users");
-const cardsRoute = require("./routes/cards");
+const authRoute = require("./routes/auth.route");
+const userRoute = require("./routes/users.route");
+const cardsRoute = require("./routes/cards.route");
 
+app.use(authRoute);
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
 
