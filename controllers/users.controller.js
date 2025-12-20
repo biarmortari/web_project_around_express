@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -57,6 +58,38 @@ module.exports.createUser = async (req, res) => {
     }
     return res.status(500).send({ message: "Erro interno no servidor" });
   }
+};
+
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .select("password")
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: "Usuário não encontrado" });
+      }
+
+      bcrypt
+        .compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return res
+              .status(401)
+              .send({ message: "Senha incorreta ou e-mail incorretos" });
+          }
+
+          const token = jwt.sign({ _id: user._id }, "hsaohjdos8y83h", {
+            expiresIn: "2h",
+          });
+
+          return res.status(200).send({ token });
+        })
+        .catch((error) => {
+          console.log("Erro ao tentar fazer login", error);
+          return res.status(500).send({ message: error.message });
+        });
+    });
 };
 
 module.exports.updateProfile = (req, res) => {
