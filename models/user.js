@@ -1,6 +1,15 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -9,13 +18,13 @@ const userSchema = new mongoose.Schema({
   },
   about: {
     type: String,
-    required: true,
+    required: false,
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
     type: String,
-    required: true,
+    required: false,
     validate: {
       validator: function (v) {
         return /^https?:\/\/(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9-]{2,}(\/[a-zA-Z0-9._~:/?%#\[\]@!$&'()*+,;=-]+)*\/?#?$/.test(
