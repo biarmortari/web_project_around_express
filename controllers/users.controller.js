@@ -14,6 +14,7 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
+    .select("-password")
     .orFail()
     .then((user) => {
       res.send({ data: user });
