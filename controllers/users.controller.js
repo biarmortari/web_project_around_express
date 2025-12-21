@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const NotFoundError = require("../errors/notFoundError");
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -17,22 +18,15 @@ module.exports.getUserById = (req, res) => {
     .select("-password")
     .orFail()
     .then((user) => {
+      if (!user) {
+        throw new NotFoundError("Usuário não encontrado");
+      }
       res.send({ data: user });
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: "Usuário não encontrado" });
-      }
-      return res
-        .status(500)
-        .send({ message: "Erro interno ao buscar usuário" });
-    });
+    .catch(next);
 };
 
-module.exports.createUser = async (req, res) => {
+module.exports.createUser = async (req, res, next) => {
   const { email, password, name, about, avatar } = req.body;
 
   try {
@@ -50,14 +44,8 @@ module.exports.createUser = async (req, res) => {
     delete userResponse.password;
 
     return res.status(201).send({ data: userResponse });
-  } catch (err) {
-    if (err.name === "ValidationError") {
-      return res.status(400).send({ message: "Dados inválidos" });
-    }
-    if (err.code === 11000) {
-      return res.status(409).send({ message: "Este e-mail já está em uso" });
-    }
-    return res.status(500).send({ message: "Erro interno no servidor" });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -68,7 +56,7 @@ module.exports.login = (req, res, next) => {
     .select("password")
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: "Usuário não encontrado" });
+        throw new NotFoundError("Usuário não encontrado");
       }
 
       bcrypt
@@ -86,10 +74,7 @@ module.exports.login = (req, res, next) => {
 
           return res.status(200).send({ token });
         })
-        .catch((error) => {
-          console.log("Erro ao tentar fazer login", error);
-          return res.status(500).send({ message: error.message });
-        });
+        .catch(next);
     });
 };
 
@@ -103,20 +88,7 @@ module.exports.updateProfile = (req, res) => {
   )
     .orFail()
     .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Dados inválidos" });
-      }
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: "Usuário não encontrado" });
-      }
-      return res
-        .status(500)
-        .send({ message: "Erro interno ao buscar usuário" });
-    });
+    .catch(next);
 };
 
 module.exports.updateAvatar = (req, res) => {
@@ -129,18 +101,5 @@ module.exports.updateAvatar = (req, res) => {
   )
     .orFail()
     .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        return res.status(400).send({ message: "Dados inválidos" });
-      }
-      if (err.name === "CastError") {
-        return res.status(400).send({ message: "ID inválido" });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: "Usuário não encontrado" });
-      }
-      return res
-        .status(500)
-        .send({ message: "Erro interno ao atualizar avatar" });
-    });
+    .catch(next);
 };

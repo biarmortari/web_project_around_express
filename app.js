@@ -2,6 +2,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 
+const authRoute = require("./routes/auth.route");
+const userRoute = require("./routes/users.route");
+const cardsRoute = require("./routes/cards.route");
+
+const errorMiddleware = require("./middleware/error.middleware");
+
 app.use(express.json());
 
 const { PORT = 3000 } = process.env;
@@ -16,13 +22,11 @@ app.use((req, res, next) => {
   next();
 });
 
-const authRoute = require("./routes/auth.route");
-const userRoute = require("./routes/users.route");
-const cardsRoute = require("./routes/cards.route");
-
 app.use(authRoute);
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
+
+app.use(errorMiddleware);
 
 app.use((req, res) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
