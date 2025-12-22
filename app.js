@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+const { errors } = require("celebrate");
 
 const authRoute = require("./routes/auth.route");
 const userRoute = require("./routes/users.route");
@@ -26,6 +27,7 @@ app.use(authRoute);
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
 
+app.use(errors());
 app.use(errorMiddleware);
 
 app.use((req, res) => {
