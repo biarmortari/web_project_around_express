@@ -9,7 +9,13 @@ const cardsRoute = require("./routes/cards.route");
 
 const errorMiddleware = require("./middleware/error.middleware");
 
+const {
+  requestLogger,
+  errorLogger,
+} = require("./middleware/logger.middleware");
+
 app.use(express.json());
+app.use(requestLogger);
 
 const { PORT = 3000 } = process.env;
 
@@ -27,6 +33,7 @@ app.use(authRoute);
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);
 
+app.use(errorLogger);
 app.use(errors());
 app.use(errorMiddleware);
 
