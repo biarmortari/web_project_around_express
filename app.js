@@ -19,8 +19,6 @@ const {
 app.use(express.json());
 app.use(requestLogger);
 
-mongoose.connect(process.env.MONGO_URI);
-
 app.use(authRoute);
 app.use("/users", userRoute);
 app.use("/cards", cardsRoute);

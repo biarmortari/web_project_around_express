@@ -43,7 +43,10 @@ module.exports.createUser = async (req, res, next) => {
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    return res.status(201).send({ data: userResponse });
+    return res.status(201).send({
+      message: "Usuário criado com sucesso",
+      data: userResponse,
+    });
   } catch (error) {
     next(error);
   }
