@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
@@ -17,9 +19,7 @@ const {
 app.use(express.json());
 app.use(requestLogger);
 
-const { PORT = 3000 } = process.env;
-
-mongoose.connect("mongodb://localhost:27017/aroundb");
+mongoose.connect(process.env.MONGO_URI);
 
 app.use(authRoute);
 app.use("/users", userRoute);
@@ -33,6 +33,4 @@ app.use((req, res) => {
   res.status(404).send({ message: "A solicitação não foi encontrada" });
 });
 
-app.listen(PORT, () => {
-  console.log(`O app está executando na porta ${PORT}`);
-});
+module.exports = app;
